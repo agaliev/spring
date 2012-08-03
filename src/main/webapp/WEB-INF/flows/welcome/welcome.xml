@@ -1,0 +1,36 @@
+<flow xmlns="http://www.springframework.org/schema/webflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow
+http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+	<view-state id="introduction">
+		<on-render>
+			<evaluate expression="waredao.getSections()" result="flowScope.sections" />
+		</on-render>
+		<transition on="chosen" to="vitrine">
+			<evaluate expression="waredao.getAssortment(requestParameters.section)"
+				result="flowScope.assortment" />
+		</transition>
+	</view-state>
+
+	<view-state id="vitrine">
+		<transition on="add" to="buy">
+			<evaluate expression="cart.addItem(requestParameters.article)" />
+			<set name="flowScope.next" value="requestParameters.article" />
+			<evaluate expression="cart.getItems()" result="flowScope.added" />
+		</transition>
+		<transition on="conclude" to="checkout">
+			<evaluate expression="cart.getTotal()" result="flowScope.total" />
+		</transition>
+	</view-state>
+
+	<view-state id="buy">
+		<transition on="continue" to="introduction" />
+		<transition on="conclude" to="checkout">
+			<evaluate expression="cart.getTotal()" result="flowScope.total" />
+		</transition>
+	</view-state>
+
+	<view-state id="checkout">
+	</view-state>
+</flow>
